@@ -30,8 +30,8 @@ from model.config import cfg
 
 import tensorboardX as tb
 
-from scipy.misc import imresize
-
+from skimage.transform import resize
+# from scipy.misc import imresize
 
 class Network(nn.Module):
     def __init__(self):
@@ -52,7 +52,10 @@ class Network(nn.Module):
     def _add_gt_image(self):
         # add back mean
         image = self._image_gt_summaries['image'] + cfg.PIXEL_MEANS
-        image = imresize(image[0], self._im_info[:2] / self._im_info[2])
+        # image = imresize(image[0], self._im_info[:2] / self._im_info[2])
+        size = (np.array(image.size) * 0.99999).astype(int)
+        image  = resize(image, size, order=3)
+        
         # BGR to RGB (opencv uses BGR)
         self._gt_image = image[np.newaxis, :, :, ::-1].copy(order='C')
 

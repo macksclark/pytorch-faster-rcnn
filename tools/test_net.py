@@ -1,4 +1,4 @@
-# --------------------------------------------------------
+#--------------------------------------------------------
 # Tensorflow Faster R-CNN
 # Licensed under The MIT License [see LICENSE for details]
 # Written by Zheqi he, Xinlei Chen, based on code from Ross Girshick
@@ -11,9 +11,12 @@ import _init_paths
 from model.test import test_net
 from model.config import cfg, cfg_from_file, cfg_from_list
 from datasets.factory import get_imdb
+from functools import partial
+import torchvision
 import argparse
 import pprint
 import time, os, sys
+import pickle
 
 from nets.vgg16 import vgg16
 from nets.resnet_v1 import resnetv1
@@ -131,8 +134,12 @@ if __name__ == '__main__':
 
     if args.model:
         print(('Loading model check point from {:s}').format(args.model))
+        pickle.load = partial(pickle.load, encoding='latin1')
+        pickle.Unpickler = partial(pickle.Unpickler, encoding='latin1')
         net.load_state_dict(
-            torch.load(args.model, map_location=lambda storage, loc: storage))
+          torch.load(args.model, map_location=lambda storage, loc: storage, pickle_module=pickle))
+        # print('Loaded.')
+        # net.load_state_dict(torchvision.models.resnet101(pretrained=True))
         print('Loaded.')
     else:
         print(('Loading initial weights from {:s}').format(args.weight))
